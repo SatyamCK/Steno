@@ -31,18 +31,29 @@ router.get(
     const attempts = await prisma.attempt.findMany({
       where: { userId: req.user.id, testId: { in: tests.map((t) => t.id) } },
       orderBy: { createdAt: 'desc' },
-      select: { id: true, testId: true },
+      select: { id: true, testId: true, totalMistakes: true, counts: true, createdAt: true },
     });
     const latest = new Map();
-    for (const a of attempts) if (!latest.has(a.testId)) latest.set(a.testId, a.id);
+    const tries = new Map();
+    for (const a of attempts) {
+      if (!latest.has(a.testId)) latest.set(a.testId, a);
+      tries.set(a.testId, (tries.get(a.testId) || 0) + 1);
+    }
 
     res.json(
-      tests.map(({ outlineImages, audioUrl, ...t }) => ({
-        ...t,
-        hasOutline: outlineImages.length > 0,
-        hasAudio: Boolean(audioUrl),
-        lastAttemptId: latest.get(t.id) || null,
-      })),
+      tests.map(({ outlineImages, audioUrl, ...t }) => {
+        const last = latest.get(t.id);
+        return {
+          ...t,
+          hasOutline: outlineImages.length > 0,
+          hasAudio: Boolean(audioUrl),
+          lastAttemptId: last?.id || null,
+          attemptCount: tries.get(t.id) || 0,
+          lastResult: last
+            ? { mistakes: last.totalMistakes, accuracy: last.counts.accuracy, at: last.createdAt }
+            : null,
+        };
+      }),
     );
   }),
 );
@@ -95,6 +106,25 @@ router.get(
       throw new HttpError(404, 'Result not found.');
     }
     res.json({ ...attempt, user: publicUser(attempt.user) });
+  }),
+);
+
+/** Numbers for the student dashboard. */
+router.get(
+  '/me/summary',
+  ah(async (req, res) => {
+    const [attempts, tests] = await Promise.all([
+      prisma.attempt.findMany({ where: { userId: req.user.id }, select: { counts: true, totalMistakes: true } }),
+      prisma.test.groupBy({ by: ['category'], where: { published: true }, _count: true }),
+    ]);
+    const acc = attempts.map((a) => a.counts.accuracy ?? 0);
+    res.json({
+      attempts: attempts.length,
+      avgAccuracy: acc.length ? Math.round((acc.reduce((s, x) => s + x, 0) / acc.length) * 10) / 10 : null,
+      bestAccuracy: acc.length ? Math.max(...acc) : null,
+      fewestMistakes: attempts.length ? Math.min(...attempts.map((a) => a.totalMistakes)) : null,
+      tests: Object.fromEntries(CATEGORIES.map((c) => [c, tests.find((t) => t.category === c)?._count || 0])),
+    });
   }),
 );
 

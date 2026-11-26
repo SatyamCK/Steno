@@ -76,3 +76,10 @@ export const session = {
     }
   },
 };
+
+/** Sets the browser tab title: "<title> · Steno Drive". */
+export function usePageTitle(title) {
+  useEffect(() => {
+    document.title = title ? `${title} · Steno Drive` : 'Steno Drive';
+  }, [title]);
+}

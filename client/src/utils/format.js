@@ -37,3 +37,12 @@ export const testLabel = (t) => (t.wpm ? `${t.title} --- ${t.wpm} WPM` : t.title
 export const pad2 = (n) => pad(n);
 
 export const isHindi = (category) => category === 'HINDI_TYPING';
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export function dateParts(value) {
+  const d = new Date(value);
+  return { day: pad(d.getDate()), mon: MONTHS[d.getMonth()], yr: d.getFullYear() };
+}
+
+/** Badge tone for an accuracy percentage. */
+export const accuracyTone = (acc) => (acc >= 95 ? 'success' : acc >= 85 ? 'warning' : 'danger');

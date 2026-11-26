@@ -1,28 +1,34 @@
+import { Link } from 'react-router-dom';
+import { useAuth, homePathFor } from '../context/AuthContext';
 import { fmtDate, fullName } from '../utils/format';
+import { Avatar } from './ui';
 
 /**
- * Green "Steno Drive" banner from the mockup.
- * `person` – whose name/photo to show (defaults to nothing on public pages).
- * `showDate` – test pages show the date under the name.
+ * Brand top bar (the mockup's green "Steno Drive" band).
+ * `person` – whose name/photo to show; defaults to the logged-in user.
  */
-export default function Header({ person, showDate = false, badge }) {
-  const initials = person
-    ? fullName(person).split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase()
-    : '';
+export default function Header({ person, badge, showUser = true }) {
+  const { user } = useAuth();
+  const who = person || (showUser ? user : null);
 
   return (
-    <header className="site-header">
-      <div className="site-header__left">
-        {person && <div className="site-header__name">{fullName(person)}</div>}
-        {showDate && <div className="site-header__date">{fmtDate()}</div>}
-      </div>
-      <h1 className="site-header__title">
-        Steno Drive{badge && <span className="site-header__badge">{badge}</span>}
-      </h1>
-      <div className="site-header__right">
-        {person && (
-          <div className="avatar" title={fullName(person)}>
-            {person.photoUrl ? <img src={person.photoUrl} alt="" /> : <span>{initials || 'SD'}</span>}
+    <header className="topbar">
+      <div className="topbar__inner">
+        <Link to={user ? homePathFor(user) : '/'} className="brand" aria-label="Steno Drive home">
+          <img src="/logo.svg" alt="" />
+          <span className="brand__name">Steno Drive</span>
+        </Link>
+        {badge && <span className="brand__tag">{badge}</span>}
+        <span className="spacer" />
+        {who && (
+          <div className="user-chip">
+            <div className="user-chip__text">
+              <div className="user-chip__name">{fullName(who)}</div>
+              <div className="user-chip__meta">
+                {who.role === 'ADMIN' ? 'Administrator' : who.username ? `@${who.username}` : 'Student'} · {fmtDate()}
+              </div>
+            </div>
+            <Avatar person={who} size={42} />
           </div>
         )}
       </div>

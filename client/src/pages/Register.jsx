@@ -1,6 +1,9 @@
+import { Camera, ImagePlus, Mail, MapPin, Phone, User, UserPlus, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { Alert, Card, Field, PageHeader, Spinner } from '../components/ui';
+import { usePageTitle } from '../utils/hooks';
 
 const STATES = [
   'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh',
@@ -16,11 +19,25 @@ const EMPTY = {
   state: '', city: '', mobile: '', email: '',
 };
 
+function Section({ icon: Icon, title, desc, children }) {
+  return (
+    <div className="form-section">
+      <div className="form-section__title">
+        <Icon size={18} />
+        <div>{title}<div className="form-section__desc">{desc}</div></div>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
 export default function Register() {
+  usePageTitle('Student Registration');
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY);
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState('');
+  const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -33,15 +50,12 @@ export default function Register() {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const onPhoto = (e) => {
-    const file = e.target.files?.[0];
+  const pickPhoto = (file) => {
     setError('');
-    if (file && file.size > 5 * 1024 * 1024) {
-      setError('Photo must be smaller than 5 MB.');
-      e.target.value = '';
-      return;
-    }
-    setPhoto(file || null);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return setError('Please choose an image file (JPG or PNG).');
+    if (file.size > 5 * 1024 * 1024) return setError('Photo must be smaller than 5 MB.');
+    setPhoto(file);
   };
 
   const onSubmit = async (e) => {
@@ -58,62 +72,94 @@ export default function Register() {
     } catch (err) {
       setError(err.message);
       setBusy(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="card card--narrow">
-      <h2 className="page-title">New Student</h2>
-      <form className="reg-form" onSubmit={onSubmit}>
-        <label className="reg-form__label" htmlFor="firstName">Student Name <span>:</span></label>
-        <div className="reg-form__fields reg-form__fields--3">
-          <input id="firstName" className="input" placeholder="First Name *" value={form.firstName} onChange={set('firstName')} required />
-          <input className="input" placeholder="Middle Name" value={form.middleName} onChange={set('middleName')} />
-          <input className="input" placeholder="Last Name" value={form.lastName} onChange={set('lastName')} />
-        </div>
+    <>
+      <PageHeader
+        title="New Student Registration"
+        subtitle="Fill in your details. After payment you will receive your username and password within 24 hours."
+      />
+      {error && <Alert tone="error" className="mb">{error}</Alert>}
+      <form onSubmit={onSubmit} style={{ marginTop: error ? 16 : 0 }}>
+        <Card bodyClass={null} footer={(
+          <div className="row">
+            <span className="small muted">Already registered? <Link to="/">Login here</Link></span>
+            <span className="spacer" />
+            <button className="btn btn--accent btn--lg" disabled={busy}>
+              {busy ? <Spinner /> : <UserPlus size={18} />} {busy ? 'Submitting…' : 'Register'}
+            </button>
+          </div>
+        )}
+        >
+          <Section icon={User} title="Student Name" desc="As it should appear on your results.">
+            <div className="form-grid form-grid--3">
+              <Field label="First name" required><input className="input" value={form.firstName} onChange={set('firstName')} required autoFocus /></Field>
+              <Field label="Middle name"><input className="input" value={form.middleName} onChange={set('middleName')} /></Field>
+              <Field label="Last name"><input className="input" value={form.lastName} onChange={set('lastName')} /></Field>
+            </div>
+          </Section>
 
-        <label className="reg-form__label" htmlFor="fatherFirstName">Father’s Name <span>:</span></label>
-        <div className="reg-form__fields reg-form__fields--3">
-          <input id="fatherFirstName" className="input" placeholder="First Name *" value={form.fatherFirstName} onChange={set('fatherFirstName')} required />
-          <input className="input" placeholder="Middle Name" value={form.fatherMiddleName} onChange={set('fatherMiddleName')} />
-          <input className="input" placeholder="Last Name" value={form.fatherLastName} onChange={set('fatherLastName')} />
-        </div>
+          <Section icon={Users} title="Father’s Name" desc="Used for verification.">
+            <div className="form-grid form-grid--3">
+              <Field label="First name" required><input className="input" value={form.fatherFirstName} onChange={set('fatherFirstName')} required /></Field>
+              <Field label="Middle name"><input className="input" value={form.fatherMiddleName} onChange={set('fatherMiddleName')} /></Field>
+              <Field label="Last name"><input className="input" value={form.fatherLastName} onChange={set('fatherLastName')} /></Field>
+            </div>
+          </Section>
 
-        <label className="reg-form__label" htmlFor="state">Address <span>:</span></label>
-        <div className="reg-form__fields reg-form__fields--2">
-          <select id="state" className="input" value={form.state} onChange={set('state')} required>
-            <option value="">State *</option>
-            {STATES.map((s) => <option key={s}>{s}</option>)}
-          </select>
-          <input className="input" placeholder="City *" value={form.city} onChange={set('city')} required />
-        </div>
+          <Section icon={MapPin} title="Address" desc="Your current state and city.">
+            <div className="form-grid">
+              <Field label="State" required>
+                <select className="input" value={form.state} onChange={set('state')} required>
+                  <option value="">Select state</option>
+                  {STATES.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </Field>
+              <Field label="City" required><input className="input" value={form.city} onChange={set('city')} required /></Field>
+            </div>
+          </Section>
 
-        <label className="reg-form__label" htmlFor="mobile">Mobile No. <span>:</span></label>
-        <div className="reg-form__fields">
-          <input
-            id="mobile" className="input" placeholder="xxxxxxxxxx" inputMode="numeric" maxLength={10}
-            pattern="[6-9][0-9]{9}" title="10-digit mobile number"
-            value={form.mobile} onChange={(e) => setForm((f) => ({ ...f, mobile: e.target.value.replace(/\D/g, '') }))} required
-          />
-        </div>
+          <Section icon={Phone} title="Contact" desc="Your login details will be sent here.">
+            <div className="form-grid">
+              <Field label="Mobile number" required hint="10-digit number, without +91">
+                <div className="input-icon">
+                  <Phone size={16} />
+                  <input
+                    className="input" inputMode="numeric" maxLength={10} pattern="[6-9][0-9]{9}" title="10-digit mobile number"
+                    placeholder="98xxxxxxxx" value={form.mobile}
+                    onChange={(e) => setForm((f) => ({ ...f, mobile: e.target.value.replace(/\D/g, '') }))} required
+                  />
+                </div>
+              </Field>
+              <Field label="Email address" required>
+                <div className="input-icon">
+                  <Mail size={16} />
+                  <input type="email" className="input" placeholder="name@example.com" value={form.email} onChange={set('email')} required />
+                </div>
+              </Field>
+            </div>
+          </Section>
 
-        <label className="reg-form__label" htmlFor="email">Email Id <span>:</span></label>
-        <div className="reg-form__fields">
-          <input id="email" type="email" className="input" placeholder="xyz@gmail.com" value={form.email} onChange={set('email')} required />
-        </div>
-
-        <label className="reg-form__label" htmlFor="photo">Upload Image <span>:</span></label>
-        <div className="reg-form__fields reg-form__photo">
-          <input id="photo" type="file" accept="image/*" onChange={onPhoto} />
-          {preview && <img src={preview} alt="Preview" className="reg-form__preview" />}
-        </div>
-
-        {error && <p className="form-error reg-form__full" role="alert">{error}</p>}
-        <div className="reg-form__full center">
-          <button className="btn btn--primary" disabled={busy}>{busy ? 'Registering…' : 'Register'}</button>
-        </div>
+          <Section icon={Camera} title="Photo" desc="A clear, recent passport-style photo.">
+            <label
+              className={`dropzone${dragOver ? ' is-over' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => { e.preventDefault(); setDragOver(false); pickPhoto(e.dataTransfer.files?.[0]); }}
+            >
+              {preview ? <img src={preview} alt="Your photo" className="dropzone__preview" /> : <span className="dropzone__ph"><ImagePlus size={28} /></span>}
+              <span>
+                <strong>{photo ? photo.name : 'Upload your photo'}</strong>
+                <div className="small muted">{photo ? 'Click to change' : 'Click to browse or drag & drop · JPG/PNG, up to 5 MB'}</div>
+              </span>
+              <input type="file" accept="image/*" onChange={(e) => pickPhoto(e.target.files?.[0])} />
+            </label>
+          </Section>
+        </Card>
       </form>
-      <p className="center muted">Already registered? <Link to="/">Login</Link></p>
-    </div>
+    </>
   );
 }
