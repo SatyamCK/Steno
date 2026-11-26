@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <circle cx="60" cy="60" r="56" fill="#156082" stroke="#0e2841" stroke-width="4"/>
+  <path d="M30 72 q 14 -30 28 0 t 30 -8" fill="none" stroke="#ffff00" stroke-width="6" stroke-linecap="round"/>
+  <text x="60" y="98" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#fff">STENO</text>
+  <text x="60" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#d9f2d0">SD</text>
+</svg>

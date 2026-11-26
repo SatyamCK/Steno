@@ -1,0 +1,85 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum Category {
+  SHORTHAND
+  ENGLISH_TYPING
+  HINDI_TYPING
+}
+
+model User {
+  id               Int        @id @default(autoincrement())
+  role             Role       @default(STUDENT)
+  status           UserStatus @default(PENDING)
+  username         String?    @unique
+  passwordHash     String?
+  firstName        String
+  middleName       String?
+  lastName         String?
+  fatherFirstName  String?
+  fatherMiddleName String?
+  fatherLastName   String?
+  state            String?
+  city             String?
+  mobile           String?
+  email            String?
+  photoUrl         String?
+  feePaid          Boolean    @default(false)
+  createdAt        DateTime   @default(now())
+  attempts         Attempt[]
+}
+
+model Test {
+  id            Int       @id @default(autoincrement())
+  category      Category
+  title         String
+  wpm           Int?
+  testDate      DateTime  @default(now())
+  durationMin   Int       @default(30)
+  /// Shorthand only: max listening time before transcription starts automatically
+  listenMin     Int       @default(4)
+  passage       String
+  audioUrl      String?
+  outlineImages String[]  @default([])
+  published     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  attempts      Attempt[]
+}
+
+model Attempt {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  testId        Int
+  typedText     String
+  timeTakenSec  Int
+  ops           Json
+  counts        Json
+  totalMistakes Int
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test          Test     @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([userId, testId])
+}
+
+model Setting {
+  key   String @id
+  value String
+}

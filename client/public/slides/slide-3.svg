@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6a4c93"/><stop offset="1" stop-color="#156082"/></linearGradient></defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g fill="#ffffff" opacity="0.92"><rect x="150" y="480" width="95" height="95" rx="12"/>
+<rect x="260" y="480" width="95" height="95" rx="12"/>
+<rect x="370" y="480" width="95" height="95" rx="12"/>
+<rect x="480" y="480" width="95" height="95" rx="12"/>
+<rect x="590" y="480" width="95" height="95" rx="12"/>
+<rect x="700" y="480" width="95" height="95" rx="12"/>
+<rect x="810" y="480" width="95" height="95" rx="12"/>
+<rect x="920" y="480" width="95" height="95" rx="12"/>
+<rect x="1030" y="480" width="95" height="95" rx="12"/>
+<rect x="1140" y="480" width="95" height="95" rx="12"/>
+<rect x="1250" y="480" width="95" height="95" rx="12"/>
+<rect x="1360" y="480" width="95" height="95" rx="12"/>
+<rect x="180" y="590" width="95" height="95" rx="12"/>
+<rect x="290" y="590" width="95" height="95" rx="12"/>
+<rect x="400" y="590" width="95" height="95" rx="12"/>
+<rect x="510" y="590" width="95" height="95" rx="12"/>
+<rect x="620" y="590" width="95" height="95" rx="12"/>
+<rect x="730" y="590" width="95" height="95" rx="12"/>
+<rect x="840" y="590" width="95" height="95" rx="12"/>
+<rect x="950" y="590" width="95" height="95" rx="12"/>
+<rect x="1060" y="590" width="95" height="95" rx="12"/>
+<rect x="1170" y="590" width="95" height="95" rx="12"/>
+<rect x="1280" y="590" width="95" height="95" rx="12"/>
+<rect x="1390" y="590" width="95" height="95" rx="12"/>
+<rect x="210" y="700" width="95" height="95" rx="12"/>
+<rect x="320" y="700" width="95" height="95" rx="12"/>
+<rect x="430" y="700" width="95" height="95" rx="12"/>
+<rect x="540" y="700" width="95" height="95" rx="12"/>
+<rect x="650" y="700" width="95" height="95" rx="12"/>
+<rect x="760" y="700" width="95" height="95" rx="12"/>
+<rect x="870" y="700" width="95" height="95" rx="12"/>
+<rect x="980" y="700" width="95" height="95" rx="12"/>
+<rect x="1090" y="700" width="95" height="95" rx="12"/>
+<rect x="1200" y="700" width="95" height="95" rx="12"/>
+<rect x="1310" y="700" width="95" height="95" rx="12"/>
+<rect x="1420" y="700" width="95" height="95" rx="12"/></g><g font-family="Noto Sans Devanagari, Arial" font-size="48" fill="#156082"><text x="180" y="545">क</text><text x="290" y="545">ख</text><text x="400" y="545">ग</text><text x="510" y="545">A</text><text x="620" y="545">S</text><text x="730" y="545">D</text></g>
+  <text x="110" y="250" font-family="Arial, sans-serif" font-size="92" font-weight="700" fill="#ffffff">English &amp; Hindi Typing</text>
+  <text x="112" y="330" font-family="Arial, sans-serif" font-size="44" fill="#d9f2d0">Practise speed and accuracy</text>
+</svg>
